@@ -1,0 +1,8 @@
+services:
+  mysql:
+    image: 'mariadb:latest'
+    environment:
+      - 'MYSQL_DATABASE=studentDb'
+      - 'MYSQL_ROOT_PASSWORD=123456'
+    ports:
+      - '3306:3306'
