@@ -67,7 +67,7 @@ void main() async {
   DatabaseHelper databaseHelper = DatabaseHelper();
 
   /* Add new student */
-  Student student = Student(id: 0, name: 'Cuong', phone: '123456789');
+  Student student = Student(id: 1, name: 'Phuc', phone: '123456789');
 
   await databaseHelper.createStudent(student);
   print('Đã thêm sinh viên mới');
