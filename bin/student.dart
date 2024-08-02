@@ -62,7 +62,10 @@ void addStudent(List<Student> students) {
     print('Phone eNumber không hợp lệ');
     return;
   }
-
+  if (!isPhone(phoneNumber)) {
+    print('Sdt phai tu 10-12 so va k duoc chua chu va ki tu dac biet');
+    return;
+  }
   /* Thêm vào danh sách */
   students.add(Student(id, name, phoneNumber));
 }
@@ -81,4 +84,8 @@ void displayStudent(List<Student> students) {
 bool isAlphabet(String str) {
   RegExp alphabet = RegExp(r'^[A-Za-z]+$');
   return alphabet.hasMatch(str);
+
+}bool isPhone(String s) {
+  RegExp phone = RegExp(r'^(?:[+0]9)?[0-9]{10,12}$');
+  return phone.hasMatch(s);
 }
