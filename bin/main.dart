@@ -142,9 +142,14 @@ Future<void> deleteStudent(MySqlConnection conn, List<Student> students) async {
     return;
   }
 
-  await conn.query('DELETE FROM Student WHERE id = ?', [id]);
-  print('Đã xóa sinh viên');
+  var isDelete = await conn.query('DELETE FROM Student WHERE id = ?', [id]);
+  if (isDelete.affectedRows! > 0) {
+    print('Xóa thành công');
+    return;
+  }
+  print('Không tìm thấy sinh viên!');
 }
+
 Future<void> findStudent(MySqlConnection conn, List<Student> students) async {
   final table = Table(
       header: ['ID', 'Student Name ',"Phone"],
