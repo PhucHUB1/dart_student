@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'AppD5.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:cli_table/cli_table.dart';
 
 void main() async {
   var settings = ConnectionSettings(
@@ -23,7 +24,8 @@ void main() async {
     2. Hiển thị danh sách sinh viên
     3. Sửa sinh viên
     4. Xóa sinh viên
-    5. Thoát
+    5. Tim sinh vien
+    6. Thoát
     Vui lòng chọn số: ''');
 
     String? choice = stdin.readLineSync();
@@ -40,7 +42,10 @@ void main() async {
       case '4':
         await deleteStudent(conn, students);
         break;
-      case '5':
+        case '5':
+        await findStudent(conn, students);
+        break;
+      case '6':
         print('Thoát chương trình');
         await conn.close();
         exit(0);
@@ -54,7 +59,7 @@ Future<void> addStudent(MySqlConnection conn, List<Student> students) async {
   stdout.write('Nhập id sinh viên: ');
   int? id = int.tryParse(stdin.readLineSync() ?? '');
   if (id == null) {
-    print('ID không hợp lệ');
+    print('ID không được trống hoăc không hợp lệ');
     return;
   }
 
@@ -79,6 +84,14 @@ Future<void> addStudent(MySqlConnection conn, List<Student> students) async {
 }
 
 Future<void> displayStudent(MySqlConnection conn, List<Student> students) async {
+  final table = Table(
+      header: ['ID', 'Student Name ',"Phone"],
+      columnWidths: [10, 20, 30],
+    style: TableStyle(
+      header:['Crimson'],
+      border: ['Black']
+    )
+  );
   var results = await conn.query("SELECT id, name, phone FROM Student");
   students.clear();
   for (var row in results) {
@@ -89,8 +102,9 @@ Future<void> displayStudent(MySqlConnection conn, List<Student> students) async 
   } else {
     print('Danh sách sinh viên:');
     for (var student in students) {
-      print(student);
+      table.add([student.id,student.name,student.phone]);
     }
+    print(table.toString());
   }
 }
 
@@ -98,21 +112,21 @@ Future<void> updateStudent(MySqlConnection conn, List<Student> students) async {
   stdout.write('Nhập id sinh viên cần sửa: ');
   int? id = int.tryParse(stdin.readLineSync() ?? '');
   if (id == null) {
-    print('ID không hợp lệ');
+    print('ID không được trống hoăc không hợp lệ');
     return;
   }
 
   stdout.write('Nhập tên mới của sinh viên: ');
   String? name = stdin.readLineSync();
   if (name == null || name.isEmpty || !isAlphabet(name)) {
-    print('Tên không hợp lệ');
+    print('Tên không được để trống hoặc có số kí tự đặc biệt');
     return;
   }
 
   stdout.write('Nhập số điện thoại mới: ');
   String? phone = stdin.readLineSync();
   if (phone == null || phone.isEmpty || !isPhone(phone)) {
-    print('Số điện thoại không hợp lệ');
+    print('Số điện thoại không để trống hoặc có chữ hay kí tự đặc biệt');
     return;
   }
 
@@ -124,12 +138,34 @@ Future<void> deleteStudent(MySqlConnection conn, List<Student> students) async {
   stdout.write('Nhập id sinh viên cần xóa: ');
   int? id = int.tryParse(stdin.readLineSync() ?? '');
   if (id == null) {
-    print('ID không hợp lệ');
+    print('ID không được trống hoăc không hợp lệ');
     return;
   }
 
   await conn.query('DELETE FROM Student WHERE id = ?', [id]);
   print('Đã xóa sinh viên');
+}
+Future<void> findStudent(MySqlConnection conn, List<Student> students) async {
+  final table = Table(
+      header: ['ID', 'Student Name ',"Phone"],
+      columnWidths: [10, 20, 30],
+      style: TableStyle(
+          header:['Crimson'],
+          border: ['Black']
+      )
+  );
+  stdout.write('Nhập id sinh viên cần tìm: ');
+  int? id = int.tryParse(stdin.readLineSync() ?? '');
+  if (id == null) {
+    print('ID không được trống hoăc không hợp lệ');
+    return;
+  }
+  await conn.query('SELECT * FROM Student WHERE id = ?',[id]);
+  for (var student in students) {
+    table.add([student.id,student.name,student.phone]);
+  }
+  print(table.toString());
+
 }
 
 bool isAlphabet(String str) {
